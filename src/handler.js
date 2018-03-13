@@ -1,34 +1,31 @@
 import prettier from 'prettier';
 
-const normalizeParams = params => Object.keys(params).reduce((normalized, key) => {
-  let value = params[key];
-  const mutations = [
-    'true',
-    'false',
-    value => /^\d+$/.test(value)
-  ];
-  
-  const shouldMutate = mutations.some(mutation => {
-    if (typeof mutation === 'function') {
-      return mutation(value);
+const normalizeParams = params =>
+  Object.keys(params).reduce((normalized, key) => {
+    let value = params[key];
+    const mutations = ['true', 'false', value => /^\d+$/.test(value)];
+
+    const shouldMutate = mutations.some(mutation => {
+      if (typeof mutation === 'function') {
+        return mutation(value);
+      }
+      return mutation === value;
+    });
+
+    if (shouldMutate) {
+      value = JSON.parse(value);
     }
-    return mutation === value;
-  });
 
-  if (shouldMutate) {
-    value = JSON.parse(value);
-  }
-
-  normalized[key] = value;
-  return normalized;
-}, {});
+    normalized[key] = value;
+    return normalized;
+  }, {});
 
 const getCodeAndParams = event => {
   if (event.httpMethod === 'POST') {
     return JSON.parse(event.body);
   }
-  return (event.queryStringParameters || {});
-}
+  return event.queryStringParameters || {};
+};
 
 export const prettierHandler = (event, context, callback) => {
   try {
@@ -46,12 +43,12 @@ export const prettierHandler = (event, context, callback) => {
     const response = {
       statusCode: 200,
       headers: {
-              "Access-Control-Allow-Origin" : "*", // Required for CORS support to work
-              "Access-Control-Allow-Credentials" : true // Required for cookies, authorization headers with HTTPS
-            },
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Credentials': true
+      },
       body: JSON.stringify({
         code: formatted
-      }),
+      })
     };
 
     callback(null, response);
