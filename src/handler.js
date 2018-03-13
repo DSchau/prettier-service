@@ -28,6 +28,9 @@ const getCodeAndParams = event => {
 };
 
 export const prettierHandler = (event, context, callback) => {
+  if (event.source === 'serverless-plugin-warmup') {
+    return callback(null, 'Keeping myself warm, ya dig');
+  }
   try {
     const { code, ...rest } = getCodeAndParams(event);
 
@@ -35,7 +38,7 @@ export const prettierHandler = (event, context, callback) => {
       throw new Error('The query parameter `code` is required');
     }
 
-    const formatted = prettier.format(code, {
+    const formatted = prettier.format(decodeURIComponent(code), {
       semi: true,
       singleQuote: true,
       ...normalizeParams(rest)
