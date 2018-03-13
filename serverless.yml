@@ -1,0 +1,21 @@
+service: prettier
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+
+functions:
+  prettier:
+    handler: dist/handler.prettierHandler
+    events:
+      - http:
+          path: prettier
+          method: get
+          cors: true
+      - http:
+          path: prettier
+          method: post
+          cors: true
+
+plugins:
+  - serverless-offline
