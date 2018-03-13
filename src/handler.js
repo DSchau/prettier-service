@@ -56,6 +56,12 @@ export const prettierHandler = (event, context, callback) => {
 
     callback(null, response);
   } catch (err) {
-    callback(err);
+    callback(
+      JSON.stringify({
+        errorType: 'Error',
+        httpStatus: 500,
+        message: err.message
+      })
+    );
   }
 };
